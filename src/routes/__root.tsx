@@ -1,14 +1,5 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import {
-  Outlet,
-  Link,
-  createRootRouteWithContext,
-  useRouter,
-  HeadContent,
-  Scripts,
-} from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
-import appCss from "../styles.css?url";
+import { Outlet, Link, createRootRoute, useRouter } from "@tanstack/react-router";
+import { useEffect } from "react";
 
 function NotFoundComponent() {
   return (
@@ -39,12 +30,18 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
         <p className="mt-2 text-sm text-stone-500">Try refreshing or head back home.</p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
-            onClick={() => { router.invalidate(); reset(); }}
-            className="px-4 py-2 text-sm bg-amber-700 text-amber-100 rounded hover:bg-amber-600 transition-colors"
+            onClick={() => {
+              router.invalidate();
+              reset();
+            }}
+            className="rounded bg-amber-700 px-4 py-2 text-sm text-amber-100 transition-colors hover:bg-amber-600"
           >
             Try again
           </button>
-          <a href="/" className="px-4 py-2 text-sm border border-stone-700 text-stone-300 rounded hover:border-stone-500 transition-colors">
+          <a
+            href="/"
+            className="rounded border border-stone-700 px-4 py-2 text-sm text-stone-300 transition-colors hover:border-stone-500"
+          >
             Go home
           </a>
         </div>
@@ -53,51 +50,8 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
-export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  head: () => ({
-    meta: [
-      { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Mythology — Ancient Athletics" },
-      { name: "description", content: "An interactive journey through ancient athletic traditions and mythology." },
-      { property: "og:title", content: "Mythology — Ancient Athletics" },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-    links: [
-      { rel: "stylesheet", href: appCss },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap",
-      },
-    ],
-  }),
-  shellComponent: RootShell,
-  component: RootComponent,
+export const Route = createRootRoute({
+  component: () => <Outlet />,
   notFoundComponent: NotFoundComponent,
   errorComponent: ErrorComponent,
 });
-
-function RootShell({ children }: { children: ReactNode }) {
-  return (
-    <html lang="en">
-      <head><HeadContent /></head>
-      <body>
-        {children}
-        <Scripts />
-      </body>
-    </html>
-  );
-}
-
-function RootComponent() {
-  const { queryClient } = Route.useRouteContext();
-  return (
-    <QueryClientProvider client={queryClient}>
-      <Outlet />
-    </QueryClientProvider>
-  );
-}
